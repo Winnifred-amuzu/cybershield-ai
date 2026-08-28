@@ -4,7 +4,11 @@ import '../services/preferences_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onComplete;
-  const OnboardingScreen({super.key, required this.onComplete});
+
+  const OnboardingScreen({
+    super.key,
+    required this.onComplete,
+  });
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -12,17 +16,36 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
+
   int _page = 0;
 
   final pages = const [
-    _OnboardData(Icons.shield_outlined, 'Detect suspicious messages', 'Analyse SMS, email and WhatsApp text with the existing Cyber-Shield AI model.'),
-    _OnboardData(Icons.warning_amber_rounded, 'Understand the warning', 'See risk level and transparent indicators such as urgency, financial language and suspicious URLs.'),
-    _OnboardData(Icons.lock_outline, 'Verify before you act', 'Cyber-Shield AI is a warning assistant, not proof. Independently verify sensitive requests through trusted channels.'),
+    _OnboardData(
+      Icons.shield_outlined,
+      'Detect suspicious messages',
+      'Analyse SMS, email and WhatsApp text with the existing Cyber-Shield AI model.',
+    ),
+    _OnboardData(
+      Icons.warning_amber_rounded,
+      'Understand the warning',
+      'See risk level and transparent indicators such as urgency, financial language and suspicious URLs.',
+    ),
+    _OnboardData(
+      Icons.lock_outline,
+      'Verify before you act',
+      'Cyber-Shield AI is a warning assistant, not proof. Independently verify sensitive requests through trusted channels.',
+    ),
   ];
 
   Future<void> _finish() async {
     await PreferencesService.completeOnboarding();
     widget.onComplete();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -37,19 +60,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: pages.length,
-                onPageChanged: (value) => setState(() => _page = value),
-                itemBuilder: (_, index) => _OnboardPage(data: pages[index]),
+                onPageChanged: (value) {
+                  setState(() {
+                    _page = value;
+                  });
+                },
+                itemBuilder: (_, index) {
+                  return _OnboardPage(
+                    data: pages[index],
+                  );
+                },
               ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(pages.length, (index) => AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                height: 7,
-                width: index == _page ? 24 : 7,
-                decoration: BoxDecoration(color: index == _page ? const Color(0xFF20D3C2) : const Color(0xFF28445C), borderRadius: BorderRadius.circular(20)),
-              )),
+              children: List.generate(
+                pages.length,
+                (index) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  height: 7,
+                  width: index == _page ? 24 : 7,
+                  decoration: BoxDecoration(
+                    color: index == _page
+                        ? const Color(0xFF20D3C2)
+                        : const Color(0xFF28445C),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
             ),
             const Spacer(),
             Padding(
@@ -62,10 +101,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     if (_page == pages.length - 1) {
                       _finish();
                     } else {
-                      _controller.nextPage(duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+                      _controller.nextPage(
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutCubic,
+                      );
                     }
                   },
-                  child: Text(_page == pages.length - 1 ? 'Get Started' : 'Continue'),
+                  child: Text(
+                    _page == pages.length - 1
+                        ? 'Get Started'
+                        : 'Continue',
+                  ),
                 ),
               ),
             ),
@@ -80,15 +126,25 @@ class _OnboardData {
   final IconData icon;
   final String title;
   final String body;
-  const _OnboardData(this.icon, this.title, this.body);
+
+  const _OnboardData(
+    this.icon,
+    this.title,
+    this.body,
+  );
 }
 
 class _OnboardPage extends StatelessWidget {
   final _OnboardData data;
-  const _OnboardPage({required this.data});
+
+  const _OnboardPage({
+    required this.data,
+  });
 
   @override
   Widget build(BuildContext context) {
+    const accentColor = Color(0xFF20D3C2);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
@@ -97,13 +153,38 @@ class _OnboardPage extends StatelessWidget {
           Container(
             width: 120,
             height: 120,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF20D3C2).withOpacity(.1), border: Border.all(color: const Color(0xFF20D3C2).withOpacity(.3))),
-            child: Icon(data.icon, size: 58, color: const Color(0xFF20D3C2)),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: accentColor.withValues(alpha: 0.10),
+              border: Border.all(
+                color: accentColor.withValues(alpha: 0.30),
+              ),
+            ),
+            child: const Icon(
+              Icons.shield_outlined,
+              size: 58,
+              color: accentColor,
+            ),
           ),
           const SizedBox(height: 38),
-          Text(data.title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 27, fontWeight: FontWeight.w800)),
+          Text(
+            data.title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 27,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
           const SizedBox(height: 16),
-          Text(data.body, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, height: 1.6, color: Colors.white.withOpacity(.65))),
+          Text(
+            data.body,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.6,
+              color: Colors.white.withValues(alpha: 0.65),
+            ),
+          ),
         ],
       ),
     );
