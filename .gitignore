@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+backend/venv/
+backend/.venv/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Flutter
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/build/
+mobile/.pub-cache/
+
+# Android
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/**/GeneratedPluginRegistrant.java
+
+# iOS/macOS
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+mobile/ios/Flutter/ephemeral/
+mobile/macos/Pods/
+mobile/macos/.symlinks/
+mobile/macos/Flutter/ephemeral/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets / environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Temporary archives
+*.zip
+
+# Generated Python bytecode anywhere
+**/__pycache__/
