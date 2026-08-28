@@ -1,0 +1,27 @@
+name: cybershield_ai
+description: Cyber-Shield AI mobile client for the existing scam detection system.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^1.2.2
+  image_picker: ^1.1.2
+  google_mlkit_text_recognition: ^0.15.0
+  shared_preferences: ^2.3.2
+  flutter_secure_storage: ^9.2.2
+  receive_sharing_intent: ^1.8.1
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

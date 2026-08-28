@@ -1,0 +1,51 @@
+{
+  "model_version": "calibrated-linear-svm-v1",
+  "model_family": "LinearSVC + Platt sigmoid calibration",
+  "calibration_method": "sigmoid",
+  "calibration_cv": 5,
+  "tuned_threshold": 0.49000000000000016,
+  "vectorizer_max_features": 5000,
+  "vectorizer_ngram_range": [
+    1,
+    2
+  ],
+  "train_test_split": 0.2,
+  "threshold_validation_fraction_of_training": 0.125,
+  "metrics": {
+    "accuracy": 0.9571655208884188,
+    "precision": 0.9445954106280193,
+    "recall": 0.9453089590572594,
+    "f1": 0.9449520501396964,
+    "brier_score": 0.032256968338894965,
+    "log_loss": 0.11441425850910122,
+    "validation_f1_at_tuned_threshold": 0.9459827507943713,
+    "test_size": 17019
+  },
+  "classification_report": {
+    "0": {
+      "precision": 0.9651755651755651,
+      "recall": 0.9647115384615385,
+      "f1-score": 0.9649434960327001,
+      "support": 10400.0
+    },
+    "1": {
+      "precision": 0.9445954106280193,
+      "recall": 0.9453089590572594,
+      "f1-score": 0.9449520501396964,
+      "support": 6619.0
+    },
+    "accuracy": 0.9571655208884188,
+    "macro avg": {
+      "precision": 0.9548854879017923,
+      "recall": 0.955010248759399,
+      "f1-score": 0.9549477730861983,
+      "support": 17019.0
+    },
+    "weighted avg": {
+      "precision": 0.9571715671175003,
+      "recall": 0.9571655208884188,
+      "f1-score": 0.9571684575248094,
+      "support": 17019.0
+    }
+  }
+}
