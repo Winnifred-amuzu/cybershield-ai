@@ -36,6 +36,7 @@ mobile/.pub-cache/
 mobile/android/.gradle/
 mobile/android/local.properties
 mobile/android/**/GeneratedPluginRegistrant.java
+mobile/android/build/
 
 # iOS/macOS
 mobile/ios/Pods/
