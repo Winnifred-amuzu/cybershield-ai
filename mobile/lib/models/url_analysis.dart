@@ -1,45 +1,61 @@
 class UrlAnalysis {
   final String url;
   final bool valid;
-  final bool https;
-  final bool longUrl;
-  final bool shortener;
+  final String scheme;
   final String host;
+  final bool isHttps;
+  final bool isShortener;
+  final bool hasUsername;
+  final bool hasNonDefaultPort;
+  final bool isLong;
   final List<String> indicators;
-  final String prediction;
-  final double confidence;
 
   const UrlAnalysis({
     required this.url,
     required this.valid,
-    required this.https,
-    required this.longUrl,
-    required this.shortener,
+    required this.scheme,
     required this.host,
+    required this.isHttps,
+    required this.isShortener,
+    required this.hasUsername,
+    required this.hasNonDefaultPort,
+    required this.isLong,
     required this.indicators,
-    required this.prediction,
-    required this.confidence,
   });
 
-  bool get isScam => prediction.toUpperCase() != 'SAFE';
+  /// URL analysis currently reports security indicators,
+  /// not an ML scam prediction.
+  bool get hasWarnings => indicators.isNotEmpty;
 
   factory UrlAnalysis.fromJson(Map<String, dynamic> json) {
-    final rawIndicators = json['indicators'] ?? const [];
+    final rawIndicators = json['indicators'] ?? const <dynamic>[];
 
     return UrlAnalysis(
       url: json['url']?.toString() ?? '',
-      valid: json['valid'] as bool? ?? false,
-      https: json['https'] as bool? ?? false,
-      longUrl: json['long_url'] as bool? ??
-          json['longUrl'] as bool? ??
-          false,
-      shortener: json['shortener'] as bool? ?? false,
+      valid: _toBool(json['valid']),
+      scheme: json['scheme']?.toString() ?? '',
       host: json['host']?.toString() ?? '',
+      isHttps: _toBool(
+        json['is_https'] ?? json['https'],
+      ),
+      isShortener: _toBool(
+        json['is_shortener'] ?? json['shortener'],
+      ),
+      hasUsername: _toBool(
+        json['has_username'],
+      ),
+      hasNonDefaultPort: _toBool(
+        json['has_non_default_port'],
+      ),
+      isLong: _toBool(
+        json['is_long'] ?? json['long_url'],
+      ),
       indicators: rawIndicators is List
-          ? rawIndicators.map((item) => item.toString()).toList()
+          ? rawIndicators
+              .map((item) => item.toString())
+              .where((item) => item.trim().isNotEmpty)
+              .toList()
           : <String>[],
-      prediction: json['prediction']?.toString() ?? 'UNKNOWN',
-      confidence: _toDouble(json['confidence']),
     );
   }
 
@@ -47,25 +63,30 @@ class UrlAnalysis {
     return {
       'url': url,
       'valid': valid,
-      'https': https,
-      'long_url': longUrl,
-      'shortener': shortener,
+      'scheme': scheme,
       'host': host,
+      'is_https': isHttps,
+      'is_shortener': isShortener,
+      'has_username': hasUsername,
+      'has_non_default_port': hasNonDefaultPort,
+      'is_long': isLong,
       'indicators': indicators,
-      'prediction': prediction,
-      'confidence': confidence,
     };
   }
 
-  static double _toDouble(dynamic value) {
+  static bool _toBool(dynamic value) {
+    if (value is bool) {
+      return value;
+    }
+
     if (value is num) {
-      return value.toDouble();
+      return value != 0;
     }
 
-    if (value is String) {
-      return double.tryParse(value) ?? 0.0;
-    }
+    final text = value?.toString().trim().toLowerCase();
 
-    return 0.0;
+    return text == 'true' ||
+        text == '1' ||
+        text == 'yes';
   }
 }

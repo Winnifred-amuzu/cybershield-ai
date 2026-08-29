@@ -12,8 +12,7 @@ class UrlAnalyzerScreen extends StatefulWidget {
 }
 
 class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
-  final TextEditingController _urlController =
-      TextEditingController();
+  final TextEditingController _urlController = TextEditingController();
 
   UrlAnalysis? _result;
   bool _loading = false;
@@ -90,71 +89,31 @@ class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Analyze a URL',
-                style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
               const SizedBox(height: 8),
               Text(
-                'Check a suspicious link for common security indicators.',
+                'URL Security Analyzer',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                'Inspect a suspicious link for common security indicators before opening it.',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.60),
+                  color: Colors.white.withValues(alpha: 0.58),
                   height: 1.4,
                 ),
               ),
               const SizedBox(height: 22),
-              TextField(
-                controller: _urlController,
-                enabled: !_loading,
-                keyboardType: TextInputType.url,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _analyze(),
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.link),
-                  hintText: 'https://example.com',
-                  labelText: 'URL',
-                ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _loading ? null : _clear,
-                      icon: const Icon(Icons.clear),
-                      label: const Text('Clear'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: FilledButton.icon(
-                      onPressed: _loading ? null : _analyze,
-                      icon: _loading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Icon(Icons.search),
-                      label: Text(
-                        _loading ? 'Analyzing...' : 'Analyze URL',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              if (_result != null) _buildResult(_result!),
+              _buildInputCard(),
+              if (_result != null) ...[
+                const SizedBox(height: 18),
+                _buildResult(_result!),
+              ],
             ],
           ),
         ),
@@ -162,11 +121,93 @@ class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
     );
   }
 
-  Widget _buildResult(UrlAnalysis result) {
-    final isScam = result.isScam;
+  Widget _buildInputCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D1D29),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: const Color(0xFF17394D),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Enter URL',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _urlController,
+            enabled: !_loading,
+            keyboardType: TextInputType.url,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _analyze(),
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.link_rounded),
+              hintText: 'https://example.com',
+              labelText: 'URL',
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _loading ? null : _clear,
+                  icon: const Icon(Icons.clear_rounded),
+                  label: const Text('Clear'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: FilledButton.icon(
+                  onPressed: _loading ? null : _analyze,
+                  icon: _loading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Icon(Icons.search_rounded),
+                  label: Text(
+                    _loading ? 'Analyzing...' : 'Analyze URL',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
-    final Color statusColor =
-        isScam ? Colors.redAccent : Colors.tealAccent;
+  Widget _buildResult(UrlAnalysis result) {
+    final hasWarnings = result.indicators.any(
+      (indicator) =>
+          !indicator.toLowerCase().startsWith('host:'),
+    );
+
+    final Color statusColor = hasWarnings
+        ? const Color(0xFFFFC857)
+        : const Color(0xFF20D3C2);
+
+    final IconData statusIcon = hasWarnings
+        ? Icons.warning_amber_rounded
+        : Icons.verified_rounded;
+
+    final String statusTitle = hasWarnings
+        ? 'Security indicators found'
+        : 'No obvious indicators found';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,31 +220,45 @@ class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: statusColor.withValues(alpha: 0.35),
+              width: 1.2,
             ),
           ),
           child: Column(
             children: [
-              Icon(
-                isScam
-                    ? Icons.warning_amber_rounded
-                    : Icons.verified_rounded,
-                size: 48,
-                color: statusColor,
+              Container(
+                width: 78,
+                height: 78,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: statusColor.withValues(alpha: 0.10),
+                  border: Border.all(
+                    color: statusColor.withValues(alpha: 0.30),
+                  ),
+                ),
+                child: Icon(
+                  statusIcon,
+                  size: 42,
+                  color: statusColor,
+                ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Text(
-                result.prediction,
+                statusTitle,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: statusColor,
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.w900,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 7),
               Text(
-                'Confidence: ${TextUtils.formatPercent(result.confidence)}',
-                style: const TextStyle(
-                  color: Colors.white60,
+                'URL inspection is an indicator-based security check, not proof that a website is safe or malicious.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.58),
+                  fontSize: 12,
+                  height: 1.4,
                 ),
               ),
             ],
@@ -213,23 +268,41 @@ class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
         _buildInfoCard(
           title: 'URL Details',
           children: [
-            _infoRow('URL', result.url),
-            _infoRow('Host', result.host.isEmpty ? 'Unknown' : result.host),
+            _infoRow(
+              'URL',
+              result.url,
+            ),
+            _infoRow(
+              'Scheme',
+              result.scheme.isEmpty ? 'Unknown' : result.scheme,
+            ),
+            _infoRow(
+              'Host',
+              result.host.isEmpty ? 'Unknown' : result.host,
+            ),
             _infoRow(
               'Valid',
               result.valid ? 'Yes' : 'No',
             ),
             _infoRow(
               'HTTPS',
-              result.https ? 'Yes' : 'No',
+              result.isHttps ? 'Yes' : 'No',
             ),
             _infoRow(
               'Long URL',
-              result.longUrl ? 'Yes' : 'No',
+              result.isLong ? 'Yes' : 'No',
             ),
             _infoRow(
               'Shortener',
-              result.shortener ? 'Detected' : 'Not detected',
+              result.isShortener ? 'Detected' : 'Not detected',
+            ),
+            _infoRow(
+              'Embedded username',
+              result.hasUsername ? 'Detected' : 'Not detected',
+            ),
+            _infoRow(
+              'Non-default port',
+              result.hasNonDefaultPort ? 'Detected' : 'Not detected',
             ),
           ],
         ),
@@ -240,17 +313,18 @@ class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
             children: result.indicators
                 .map(
                   (indicator) => Padding(
-                    padding: const EdgeInsets.only(bottom: 9),
+                    padding: const EdgeInsets.only(bottom: 10),
                     child: Row(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          isScam
-                              ? Icons.warning_amber_rounded
-                              : Icons.info_outline,
+                          indicator.toLowerCase().startsWith('host:')
+                              ? Icons.dns_outlined
+                              : Icons.warning_amber_rounded,
                           size: 18,
-                          color: statusColor,
+                          color: indicator.toLowerCase().startsWith('host:')
+                              ? const Color(0xFF20D3C2)
+                              : statusColor,
                         ),
                         const SizedBox(width: 9),
                         Expanded(
@@ -269,6 +343,39 @@ class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
                 .toList(),
           ),
         ],
+        const SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A1725),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFF17394D),
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.verified_user_outlined,
+                color: Color(0xFF20D3C2),
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Do not rely on HTTPS alone. Verify the domain, sender and context before entering passwords, payment details or other sensitive information.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.58),
+                    fontSize: 12,
+                    height: 1.45,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -311,7 +418,7 @@ class _UrlAnalyzerScreenState extends State<UrlAnalyzerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 90,
+            width: 125,
             child: Text(
               label,
               style: const TextStyle(
