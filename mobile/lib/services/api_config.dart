@@ -14,7 +14,7 @@ class ApiConfig {
   /// backend so existing development behavior is preserved.
   static const String serverUrl = String.fromEnvironment(
     'CYBERSHIELD_API_URL',
-    defaultValue: 'http://192.168.10.180:8000',
+    defaultValue: '10.128.250.109',
   );
 
   static String get baseUrl {
